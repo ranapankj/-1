@@ -13,7 +13,7 @@ public class Strategy      //如果编译多个策略请随机修改此类名，
         if (zoneHand != null)
         {
             List<string> fire;
-            fire = new List<string>(new string[] { "米尔豪斯", "瓦尔登", "萨尔", "凯恩", "安度因", "迪亚波罗" });
+            fire = new List<string>(new string[] { "米尔豪斯·法力风暴", "瓦尔登·晨拥", "萨尔", "凯恩·血蹄", "安度因·乌瑞恩", "迪亚波罗" });
 
             foreach (string name in fire)
             {
@@ -35,13 +35,14 @@ public class Strategy      //如果编译多个策略请随机修改此类名，
         //MessageBox.Show("战斗处理");
         ZonePlay zonePlay = ZoneMgr.Get().FindZoneOfType<ZonePlay>(global::Player.Side.FRIENDLY);
         ZonePlay enemyPlayZone = ZoneMgr.Get().FindZoneOfType<ZonePlay>(global::Player.Side.OPPOSING);
-        List<string> fire = new List<string>(new string[] { "米尔豪斯", "瓦尔登", "萨尔", "凯恩", "安度因", "迪亚波罗" });
-        List<string> AbilityNames = new List<string>(new string[] { "魔爆术", "冰风暴", "闪电风暴", "坚韧光环", "大地践踏", "神圣新星", "苦修", "火焰践踏", "末日" });
-        foreach (string name in fire)
+        List<string> fire = new List<string>(new string[] { "米尔豪斯·法力风暴", "瓦尔登·晨拥", "萨尔", "凯恩·血蹄", "安度因·乌瑞恩", "迪亚波罗" });
+        List<string> AbilityNames = new List<string>(new string[] { "魔爆术", "冰风暴", "闪电风暴", "大地践踏", "坚韧光环", "神圣新星", "苦修", "火焰践踏", "末日" });
+
+        for (int i = 0; i < fire.Count; i++)
         {
             foreach (Card card in zonePlay.GetCards())
             {
-                if (name == card.GetEntity().GetName())
+                if (fire[i] == card.GetEntity().GetName())
                 {
                     MyHsHelper.MyHsHelper.Battles battles = new MyHsHelper.MyHsHelper.Battles();
                     //battles.source = card.GetEntity();
@@ -56,20 +57,24 @@ public class Strategy      //如果编译多个策略请随机修改此类名，
                             if (AbilityName == s && GameState.Get().HasResponse(AbilityEntity, new bool?(false)))
                             {
                                 battles.Ability = AbilityEntity;
+                                if (AbilityName == "神圣新星" || AbilityName == "火焰践踏")
+                                { i++; }
                                 break;
                             }
                         }
                         if (battles.Ability != null) { break; }
                     }
 
-                    if (name == "安度因")
+                    if (fire[i] == "安度因")
                     {
-                        battles.target = HandleCards(enemyPlayZone.GetCards(), true, false, true, TAG_ROLE.TANK);
+                        if (battles.Ability.GetName().IndexOf("苦修") > 0)
+                            battles.target = HandleCards(enemyPlayZone.GetCards(), true, false, true, TAG_ROLE.TANK);
                     }
 
-                    if (name == "迪亚波罗")
+                    if (fire[i] == "迪亚波罗")
                     {
-                        battles.target = HandleCards(enemyPlayZone.GetCards(), true, false, true, TAG_ROLE.CASTER);
+                        if (battles.Ability.GetName().IndexOf("末日") > 0)
+                            battles.target = HandleCards(enemyPlayZone.GetCards(), true, false, true, TAG_ROLE.CASTER);
                     }
                     MyHsHelper.MyHsHelper.BattleQueue.Enqueue(battles);
                 }
