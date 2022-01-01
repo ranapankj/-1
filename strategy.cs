@@ -13,13 +13,8 @@ public class Strategy      //如果编译多个策略请随机修改此类名，
         if (zoneHand != null)
         {
             List<string> fire;
-            MyHsHelper.MyHsHelper.State state = new MyHsHelper.MyHsHelper.State();
-            if (state.IsPVP)
-            {
-                fire = new List<string>(new string[] { "凯瑞尔·罗姆", "玛法里奥·怒风", "古夫·符文图腾", "布鲁坎", "安东尼达斯", "迦顿男爵", "拉格纳罗斯", "泽瑞拉", "剑圣萨穆罗" });
-            } else {
-                fire = new List<string>(new string[] { "玛法里奥·怒风", "古夫·符文图腾", "布鲁坎", "安东尼达斯", "迦顿男爵", "拉格纳罗斯", "凯瑞尔·罗姆", "泽瑞拉", "剑圣萨穆罗" });
-            }
+            fire = new List<string>(new string[] { "米尔豪斯", "瓦尔登", "萨尔", "凯恩", "安度因", "迪亚波罗" });
+
             foreach (string name in fire)
             {
                 foreach (Card card in zoneHand.GetCards())
@@ -40,8 +35,8 @@ public class Strategy      //如果编译多个策略请随机修改此类名，
         //MessageBox.Show("战斗处理");
         ZonePlay zonePlay = ZoneMgr.Get().FindZoneOfType<ZonePlay>(global::Player.Side.FRIENDLY);
         ZonePlay enemyPlayZone = ZoneMgr.Get().FindZoneOfType<ZonePlay>(global::Player.Side.OPPOSING);
-        List<string> fire = new List<string>(new string[] { "玛法里奥·怒风", "古夫·符文图腾", "布鲁坎", "安东尼达斯", "迦顿男爵", "拉格纳罗斯", "凯瑞尔·罗姆", "泽瑞拉", "剑圣萨穆罗" });
-        List<string> AbilityNames = new List<string>(new string[] { "塞纳里奥波动", "活体荆棘", "闪电链", "闪电箭", "火球术", "地狱火", "死吧，虫子", "嘲讽", "致盲之光", "二连击" });
+        List<string> fire = new List<string>(new string[] { "米尔豪斯", "瓦尔登", "萨尔", "凯恩", "安度因", "迪亚波罗" });
+        List<string> AbilityNames = new List<string>(new string[] { "魔爆术", "冰风暴", "闪电风暴", "大地践踏", "神圣新星", "苦修", "火焰践踏", "末日" });
         foreach (string name in fire)
         {
             foreach (Card card in zonePlay.GetCards())
@@ -67,33 +62,12 @@ public class Strategy      //如果编译多个策略请随机修改此类名，
                         if (battles.Ability != null) { break; }
                     }
 
-                    if (name == "凯瑞尔·罗姆" && card.GetEntity().HasTaunt())
-                    {
-                        foreach (Entity entity in GetLettuceAbilityEntitys(card.GetEntity()))
-                        {
-                            string s = entity.GetName();
-                            s = s.Substring(0, s.Length - 1);
-                            if (s == "远征军打击")
-                            {
-                                battles.Ability = entity;
-                                battles.target = HandleCards(enemyPlayZone.GetCards(), true, false, true);
-                                break;
-                            }
-                        }
-                    }
-
-                    if (new List<string>(new string[] { "玛法里奥·怒风", "古夫·符文图腾", "布鲁坎" }).Contains(name))
+                    if (name == "安度因")
                     {
                         battles.target = HandleCards(enemyPlayZone.GetCards(), true, false, false, TAG_ROLE.TANK);
                     }
 
-                    if (name == "安东尼达斯")
-                    {
-                        MyHsHelper.MyHsHelper.State state = new MyHsHelper.MyHsHelper.State();
-                        battles.target = HandleCards(enemyPlayZone.GetCards(), state.IsPVP, !state.IsPVP);
-                    }
-
-                    if (new List<string>(new string[] { "泽瑞拉", "剑圣萨穆罗" }).Contains(name))
+                    if (name == "迪亚波罗")
                     {
                         battles.target = HandleCards(enemyPlayZone.GetCards(),true,false, true, TAG_ROLE.CASTER);
                     }
