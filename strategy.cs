@@ -36,7 +36,7 @@ public class Strategy      //如果编译多个策略请随机修改此类名，
         ZonePlay zonePlay = ZoneMgr.Get().FindZoneOfType<ZonePlay>(global::Player.Side.FRIENDLY);
         ZonePlay enemyPlayZone = ZoneMgr.Get().FindZoneOfType<ZonePlay>(global::Player.Side.OPPOSING);
         List<string> fire = new List<string>(new string[] { "米尔豪斯", "瓦尔登", "萨尔", "凯恩", "安度因", "迪亚波罗" });
-        List<string> AbilityNames = new List<string>(new string[] { "魔爆术", "冰风暴", "闪电风暴", "大地践踏", "神圣新星", "苦修", "火焰践踏", "末日" });
+        List<string> AbilityNames = new List<string>(new string[] { "魔爆术", "冰风暴", "闪电风暴", "坚韧光环", "大地践踏", "神圣新星", "苦修", "火焰践踏", "末日" });
         foreach (string name in fire)
         {
             foreach (Card card in zonePlay.GetCards())
@@ -64,12 +64,12 @@ public class Strategy      //如果编译多个策略请随机修改此类名，
 
                     if (name == "安度因")
                     {
-                        battles.target = HandleCards(enemyPlayZone.GetCards(), true, false, false, TAG_ROLE.TANK);
+                        battles.target = HandleCards(enemyPlayZone.GetCards(), true, false, true, TAG_ROLE.TANK);
                     }
 
                     if (name == "迪亚波罗")
                     {
-                        battles.target = HandleCards(enemyPlayZone.GetCards(),true,false, true, TAG_ROLE.CASTER);
+                        battles.target = HandleCards(enemyPlayZone.GetCards(), true, false, true, TAG_ROLE.CASTER);
                     }
                     MyHsHelper.MyHsHelper.BattleQueue.Enqueue(battles);
                 }
@@ -86,11 +86,12 @@ public class Strategy      //如果编译多个策略请随机修改此类名，
     /// <param name="isTaunt">攻击嘲讽目标</param>
     /// <param name="tAG_ROLE">目标类型(护卫，斗士，施法者)</param>
     /// <returns>返回目标Entity</returns>
-    private Entity HandleCards(List<Card> cards,bool healthMin = false , bool healthMax = false ,bool isTaunt = false, TAG_ROLE tAG_ROLE = TAG_ROLE.INVALID)
+    private Entity HandleCards(List<Card> cards, bool healthMin = false, bool healthMax = false, bool isTaunt = false, TAG_ROLE tAG_ROLE = TAG_ROLE.INVALID)
     {
+
         foreach (Card card in cards)
         {
-            if (card.GetEntity().GetMercenaryRole() == tAG_ROLE  && !card.GetEntity().IsStealthed() && isTaunt)
+            if (card.GetEntity().GetMercenaryRole() == tAG_ROLE && !card.GetEntity().IsStealthed() && isTaunt)
             {
                 return card.GetEntity();
             }
