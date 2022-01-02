@@ -13,7 +13,7 @@ public class Strategy      //如果编译多个策略请随机修改此类名，
         if (zoneHand != null)
         {
             List<string> fire;
-            fire = new List<string>(new string[] { "米尔豪斯·法力风暴", "瓦尔登·晨拥", "萨尔", "凯恩·血蹄", "安度因·乌瑞恩", "迪亚波罗" });
+            fire = new List<string>(new string[] { "米尔豪斯·法力风暴", "瓦尔登·晨拥", "萨尔", "凯恩·血蹄", "迪亚波罗", "安度因·乌瑞恩" });
 
             foreach (string name in fire)
             {
@@ -32,52 +32,73 @@ public class Strategy      //如果编译多个策略请随机修改此类名，
 
     public void Combat()        //战斗处理
     {
-        //MessageBox.Show("战斗处理");
         ZonePlay zonePlay = ZoneMgr.Get().FindZoneOfType<ZonePlay>(global::Player.Side.FRIENDLY);
         ZonePlay enemyPlayZone = ZoneMgr.Get().FindZoneOfType<ZonePlay>(global::Player.Side.OPPOSING);
-        List<string> fire = new List<string>(new string[] { "米尔豪斯·法力风暴", "瓦尔登·晨拥", "萨尔", "凯恩·血蹄", "安度因·乌瑞恩", "迪亚波罗" });
-        List<string> AbilityNames = new List<string>(new string[] { "魔爆术", "冰风暴", "闪电风暴", "大地践踏", "坚韧光环", "神圣新星", "苦修", "火焰践踏", "末日" });
-
-        for (int i = 0; i < fire.Count; i++)
+        MyHsHelper.MyHsHelper.Battles Diablos = new MyHsHelper.MyHsHelper.Battles();
+        foreach (Card card in zonePlay.GetCards())
         {
-            foreach (Card card in zonePlay.GetCards())
+            string name = card.GetEntity().GetName();
+            MyHsHelper.MyHsHelper.Battles battles = new MyHsHelper.MyHsHelper.Battles();
+            //battles.source = card.GetEntity();
+            List<Entity> AbilityEntitys = GetLettuceAbilityEntitys(card.GetEntity());
+
+            if (name == "米尔豪斯·法力风暴")
             {
-                if (fire[i] == card.GetEntity().GetName())
-                {
-                    MyHsHelper.MyHsHelper.Battles battles = new MyHsHelper.MyHsHelper.Battles();
-                    //battles.source = card.GetEntity();
-                    List<Entity> AbilityEntitys = GetLettuceAbilityEntitys(card.GetEntity());
+                battles.Ability = selAbility(AbilityEntitys, "魔爆术");
+            }
 
-                    foreach (string AbilityName in AbilityNames)
-                    {
-                        foreach (Entity AbilityEntity in AbilityEntitys)
-                        {
-                            string s = AbilityEntity.GetName();
-                            s = s.Substring(0, s.Length - 1);
-                            if (AbilityName == s && GameState.Get().HasResponse(AbilityEntity, new bool?(false)))
-                            {
-                                battles.Ability = AbilityEntity;
-                                if (AbilityName == "神圣新星" || AbilityName == "火焰践踏")
-                                { i++; }
-                                break;
-                            }
-                        }
-                        if (battles.Ability != null) { break; }
-                    }
+            if (name == "瓦尔登·晨拥")
+            {
+                battles.Ability = selAbility(AbilityEntitys, "冰风暴");
+            }
 
-                    if (fire[i] == "安度因")
-                    {
-                        if (battles.Ability.GetName().IndexOf("苦修") > 0)
-                            battles.target = HandleCards(enemyPlayZone.GetCards(), true, false, true, TAG_ROLE.TANK);
-                    }
+            if (name == "萨尔")
+            {
+                battles.Ability = selAbility(AbilityEntitys, "闪电风暴");
+            }
 
-                    if (fire[i] == "迪亚波罗")
-                    {
-                        if (battles.Ability.GetName().IndexOf("末日") > 0)
-                            battles.target = HandleCards(enemyPlayZone.GetCards(), true, false, true, TAG_ROLE.CASTER);
-                    }
-                    MyHsHelper.MyHsHelper.BattleQueue.Enqueue(battles);
+            if (name == "凯恩·血蹄")
+            {
+                battles.Ability = selAbility(AbilityEntitys, "大地践踏");
+                if (battles.Ability.GetName().IndexOf("大地践踏") == -1)
+                { 
+                    battles.Ability = selAbility(AbilityEntitys, "坚韧光环");
                 }
+            }
+
+            if (name == "安度因·乌瑞恩")
+            {
+                battles.Ability = selAbility(AbilityEntitys, "神圣新星");
+                if (battles.Ability.GetName().IndexOf("苦修") > 0)
+                { 
+                    battles.target = HandleCards(enemyPlayZone.GetCards(), true, false, true, TAG_ROLE.TANK);
+                }
+            }
+
+            if (name == "迪亚波罗")
+            {
+                Diablos.Ability = selAbility(AbilityEntitys, "火焰践踏");
+                if (Diablos.Ability.GetName().IndexOf("火焰践踏") == -1)
+                {
+                    Diablos.Ability = selAbility(AbilityEntitys, "末日");
+                }
+                if (Diablos.Ability.GetName().IndexOf("末日") > 0)
+                {
+                    Diablos.target = HandleCards(enemyPlayZone.GetCards(), true, false, true, TAG_ROLE.CASTER);
+                }
+            }
+            if (battles.Ability != null)
+            { 
+            MyHsHelper.MyHsHelper.BattleQueue.Enqueue(battles);
+            }
+        }
+        if (Diablos.Ability != null)
+        {
+            MyHsHelper.MyHsHelper.BattleQueue.Enqueue(Diablos);
+            for (int i = 0; i < MyHsHelper.MyHsHelper.BattleQueue.Count - 1; i++)
+            {
+                Diablos = MyHsHelper.MyHsHelper.BattleQueue.Dequeue();
+                MyHsHelper.MyHsHelper.BattleQueue.Enqueue(Diablos);
             }
         }
     }
@@ -148,6 +169,31 @@ public class Strategy      //如果编译多个策略请随机修改此类名，
         return m_displayedAbilityEntitys;
     }
 
+    private Entity selAbility(List<Entity> AbilityEntitys, string AbilityName)
+    {
+        //MessageBox.Show(AbilityName);
+        foreach (Entity AbilityEntity in AbilityEntitys)        //按技能名返回技能
+        {
+            string s = AbilityEntity.GetName();
+            s = s.Substring(0, s.Length - 1);
+            //MessageBox.Show(s);
+            if (AbilityName == s && GameState.Get().HasResponse(AbilityEntity, new bool?(false)))
+            {
+                return AbilityEntity;
+            }
+        }
+        //如果技能不可用则返回第一个技能
+        Entity entity = new Entity();
+        foreach (Entity AbilityEntity in AbilityEntitys)
+        {
+            if (GameState.Get().HasResponse(AbilityEntity, new bool?(false)))
+            {
+                entity = AbilityEntity;
+                break;
+            }
+        }
+        return entity;
+    }
 }
 
 
